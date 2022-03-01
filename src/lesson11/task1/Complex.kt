@@ -8,23 +8,21 @@ import kotlin.time.toDuration
 /**
  * Фабричный метод для создания комплексного числа из строки вида x+yi
  */
-val complexRegex = "^(\\d*)(?:([\\+-])(\\d*)i)?\$".toRegex()
+val complexRegex = "^(?:(\\d*)([\\+-]|\$))?(\\d*)?(i)?\$".toRegex()
 
 fun Complex(s: String): Complex {
     val matchResult = complexRegex.find(s)
     return if (matchResult != null) {
         val match = matchResult.destructured
-        val real = match.component1().toIntOrNull()
-            ?: throw IllegalArgumentException("Invalid format")
-        val imaginary = if (match.component2() != "" && match.component3() != "") {
-            val multiplier = when (match.component2()) {
-                "+" -> 1
-                else -> -1
-            }
-            val rawImaginary = match.component3().toIntOrNull() ?: throw IllegalArgumentException("Invalid format")
-            multiplier * rawImaginary
-        } else 0.0
-        Complex(real.toDouble(), imaginary.toDouble())
+        // Would be nice to make the regex not match this, but I couldn't figure out a smart way to do it
+        if (match.component4() == "" && match.component2() != "") throw IllegalArgumentException("Invalid format")
+        val real = match.component1().toIntOrNull() ?: 0
+        val imaginaryMultiplier = if (match.component2() == "-") -1 else 1
+        // The 4th component is to properly handle stuff like 1+i
+        val rawImaginary = if (match.component4() == "i") {
+            match.component3().toIntOrNull() ?: 1
+        } else 0
+        Complex(real.toDouble(), imaginaryMultiplier * rawImaginary.toDouble())
     } else throw IllegalArgumentException("Invalid format")
 }
 
