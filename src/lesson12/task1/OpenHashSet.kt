@@ -42,9 +42,9 @@ class OpenHashSet<T>(val capacity: Int) {
     fun add(element: T): Boolean {
         val hash = hash(element)
 
-        if(size != capacity) {
-            for(i in hash until capacity) {
-                when(elements[i]) {
+        if (size != capacity) {
+            for (i in hash until capacity) {
+                when (elements[i]) {
                     null -> {
                         elements[i] = element
                         return true
@@ -62,7 +62,7 @@ class OpenHashSet<T>(val capacity: Int) {
     operator fun contains(element: T): Boolean {
         val hash = hash(element)
 
-        for(i in hash until capacity) {
+        for (i in hash until capacity) {
             if (elements[i] == element) return true
             else if (elements[i] == null) return false
         }
@@ -74,22 +74,23 @@ class OpenHashSet<T>(val capacity: Int) {
      * и любой элемент из второй таблицы входит также и в первую
      */
     override fun equals(other: Any?): Boolean {
-        return if(this === other) true
-               else if(other !is OpenHashSet<*>) false
-               else if(other.size == 0 && size == 0) true
-               else if(other.size != size) false
-               // Horrible hack for horrible language
-               else if(elements.find({ it != null})!!::class != other.elements.find({ it != null})!!::class) false
-               else {
-                 for (i in elements) {
-                    if(i != null && (other as OpenHashSet<T>).contains(i as T) == false) return false
-                 }
-                 true
-               }
+        return if (this === other) true
+        else if (other !is OpenHashSet<*>) false
+        else if (other.size == 0 && size == 0) true
+        else if (other.size != size) false
+        // Horrible hack for horrible language
+        else if (elements.find({ it != null })!!::class != other.elements.find({ it != null })!!::class) false
+        else {
+            for (i in elements) {
+                if (i != null && (other as OpenHashSet<T>).contains(i as T) == false) return false
+            }
+            true
+        }
     }
+
     override fun hashCode(): Int {
         val hashes = mutableListOf<Int>()
-        elements.filter({it != null}).forEach {hashes.add(it.hashCode())}
+        elements.filter({ it != null }).forEach { hashes.add(it.hashCode()) }
         hashes.sort()
         var hashCode = 0
         for (hash in hashes) {
