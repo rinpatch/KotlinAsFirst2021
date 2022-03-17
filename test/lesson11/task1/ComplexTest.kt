@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Tag
+import java.lang.IllegalArgumentException
 
 internal class ComplexTest {
 
@@ -47,5 +48,14 @@ internal class ComplexTest {
     fun equals() {
         assertApproxEquals(Complex(1.0, 2.0), Complex("1+2i"), 1e-12)
         assertApproxEquals(Complex(1.0, 0.0), Complex(1.0), 1e-12)
+    }
+
+    @Test
+    fun constructor() {
+        assertThrows(IllegalArgumentException::class.java) { Complex("") }
+        assertThrows(IllegalArgumentException::class.java) { Complex("50+50") }
+        assertThrows(IllegalArgumentException::class.java) { Complex("50+") }
+        assertApproxEquals(Complex(50.0, 1.0), Complex("50+i"), 1e-12)
+        assertApproxEquals(Complex(50.0, -1.0), Complex("50-i"), 1e-12)
     }
 }

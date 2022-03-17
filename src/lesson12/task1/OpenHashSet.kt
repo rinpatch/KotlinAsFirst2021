@@ -25,7 +25,8 @@ class OpenHashSet<T>(val capacity: Int) {
     /**
      * Число элементов в хеш-таблице
      */
-    val size: Int get() = elements.count({ it != null })
+    private var _size: Int = 0
+    val size: Int get() = _size
 
     /**
      * Признак пустоты
@@ -33,6 +34,20 @@ class OpenHashSet<T>(val capacity: Int) {
     fun isEmpty(): Boolean = size == 0
 
     private fun hash(element: T) = element.hashCode() % capacity
+
+    private fun linearProbeIndex(element: T): Int {
+        val hash = hash(element)
+        var i = 0
+        while (i < capacity) {
+            val index = (hash + i) % capacity
+            when (elements[index]) {
+                element -> return index
+                null -> return index
+            }
+            i += 1
+        }
+        return -1
+    }
 
     /**
      * Добавление элемента.
@@ -42,20 +57,13 @@ class OpenHashSet<T>(val capacity: Int) {
     fun add(element: T): Boolean {
         if (element == null) throw IllegalArgumentException("This HashSet impl can not store null values")
 
-        val hash = hash(element)
-
         if (size != capacity) {
-            var i = 0
-            while(i < capacity) {
-                val index = (hash + i) % capacity
-                when (elements[index]) {
-                    null -> {
-                        elements[index] = element
-                        return true
-                    }
-                    element -> return false
+            return when (val index = linearProbeIndex(element)) {
+                -1 -> false
+                else -> {
+                    elements[index] = element
+                    true
                 }
-                i += 1
             }
         }
         return false
@@ -64,18 +72,11 @@ class OpenHashSet<T>(val capacity: Int) {
     /**
      * Проверка, входит ли заданный элемент в хеш-таблицу
      */
-    operator fun contains(element: T): Boolean {
-        val hash = hash(element)
-
-        var i = 0
-        while(i < capacity) {
-            val index = (hash + i) % capacity
-            if (elements[index] == element) return true
-            else if (elements[index] == null) return false
-            i += 1
+    operator fun contains(element: T): Boolean =
+        when (val index = linearProbeIndex(element)) {
+            -1 -> false
+            else -> elements[index] != null
         }
-        return false
-    }
 
     /**
      * Таблицы равны, если в них одинаковое количество элементов,

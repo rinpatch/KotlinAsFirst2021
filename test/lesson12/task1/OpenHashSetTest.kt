@@ -42,8 +42,20 @@ class OpenHashSetTest {
             assertTrue(word in set.elements)
         }
         assertFalse(set.add("???"))
+        assertEquals(4, set.size)
     }
 
+    @Test
+    fun linearProbeTest() {
+        val set = OpenHashSet<Int>(3)
+        // Sanity check
+        // Depends on how OpenHashSet.hash is implemented
+        assertEquals(8.hashCode() % 3, 2.hashCode() % 3)
+        assertTrue(set.add(8))
+        assertTrue(set.add(2))
+        assertTrue(set.contains(8))
+        assertTrue(set.contains(2))
+    }
     @Test
     @Tag("10")
     fun contains() {

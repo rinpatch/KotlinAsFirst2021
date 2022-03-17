@@ -12,7 +12,7 @@ val complexRegex = "^(?:(\\d*)([\\+-]|\$))?(\\d*)?(i)?\$".toRegex()
 
 fun Complex(s: String): Complex {
     val matchResult = complexRegex.find(s)
-    return if (matchResult != null) {
+    return if (s != "" && matchResult != null) {
         val match = matchResult.destructured
         // Would be nice to make the regex not match this, but I couldn't figure out a smart way to do it
         if (match.component4() == "" && match.component2() != "") throw IllegalArgumentException("Invalid format")
@@ -76,13 +76,12 @@ class Complex(val re: Double, val im: Double) {
     /**
      * Сравнение на равенство
      */
-    override fun equals(other: Any?): Boolean {
-        return if (other is Complex) {
+    override fun equals(other: Any?): Boolean =
+        if (other is Complex) {
             this.re == other.re && this.im == other.im
         } else {
             false
         }
-    }
 
     /**
      * Преобразование в строку
