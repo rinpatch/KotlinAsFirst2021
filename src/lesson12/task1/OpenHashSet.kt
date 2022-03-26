@@ -61,8 +61,11 @@ class OpenHashSet<T>(val capacity: Int) {
             return when (val index = linearProbeIndex(element)) {
                 -1 -> false
                 else -> {
-                    elements[index] = element
-                    true
+                    if (elements[index] == null) {
+                        elements[index] = element
+                        _size++
+                        true
+                    } else false
                 }
             }
         }
@@ -82,19 +85,18 @@ class OpenHashSet<T>(val capacity: Int) {
      * Таблицы равны, если в них одинаковое количество элементов,
      * и любой элемент из второй таблицы входит также и в первую
      */
-    override fun equals(other: Any?): Boolean =
-        if (this === other) true
+    override fun equals(other: Any?): Boolean {
+        return if (this === other) true
         else if (other !is OpenHashSet<*>) false
         else if (other.size == 0 && size == 0) true
         else if (other.size != size) false
-        // Horrible hack for horrible language
-        else if (elements.find({ it != null })!!::class != other.elements.find({ it != null })!!::class) false
         else {
-            for (i in elements) {
-                if (i != null && (other as OpenHashSet<T>).contains(i as T) == false) false
+            for (i in other.elements) {
+                if (i != null && !contains(i as T)) return false
             }
             true
         }
+    }
 
     override fun hashCode(): Int {
         val hashes = elements.filter({ it != null }).map { it.hashCode() }.sorted()
